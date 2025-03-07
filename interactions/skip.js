@@ -1,6 +1,6 @@
 let {queue} = require("./play");
 let {createAudioResource} = require('@discordjs/voice');
-let ytdl=require("ytdl-core");
+let ytdl=require("@distube/ytdl-core");
 const { SlashCommandBuilder } = require('@discordjs/builders');
 module.exports = {
 	data: new SlashCommandBuilder()

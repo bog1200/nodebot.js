@@ -1,4 +1,4 @@
-const ytdl = require("ytdl-core");
+const ytdl = require("@distube/ytdl-core");
 const ytpl = require('ytpl');
 const axios = require('axios');
 const queue = new Map();
@@ -8,6 +8,7 @@ const {spotifyApi} = require("../utils/spotify");
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { AudioPlayerStatus, createAudioPlayer, createAudioResource, joinVoiceChannel } = require('@discordjs/voice');
 const { MessageEmbed } = require("discord.js");
+const cookies = require("../utils/ytcookie")
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('play')
@@ -31,6 +32,7 @@ module.exports = {
 
     async function runCommand()
     {
+      //const agent = ytdl.createAgent(cookies);
       let player;
       if (AudioPlayerStatus.Idle) player = createAudioPlayer();
       const song_input=interaction.options.getString('song');

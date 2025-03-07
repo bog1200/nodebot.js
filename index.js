@@ -36,11 +36,48 @@ async function loginDiscord() {
 }
 ///
 
+async function updateElection(){
+	const myHeaders = new Headers();
+	myHeaders.append("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0");
+	myHeaders.append("Referer", "https://prezenta.roaep.ro/europarlamentare09062024/");
+	myHeaders.append("Priority", "u=1. i");
+	myHeaders.append("Cookie", "route=f735d29b12152c7fef44cc24f12a28bf");
+	
+	const requestOptions = {
+	  method: "GET",
+	  headers: myHeaders,
+	  redirect: "follow"
+	};
+	console.log("ELECTION QUERY")
+	fetch("https://prezenta.roaep.ro/europarlamentare09062024/data/json/simpv/presence/activity.json?_="+new Date().getTime(), requestOptions)
+	  .then((response) => response.json())
+	  .then(async (result) => {
+		const activity = result[0].activity;
+		const sum = Object.values(activity).reduce((acc, value) => acc + value, 0);
+		console.log(sum);
+        const channel = await client.channels.fetch("1249124976515354655");
+		await channel.send(`EU 2024: <t:${Math.floor(new Date().getTime()/1000)}:R> ${sum} (${(sum/18016674)*100} %)`);
+		await channel.setName(`EU 2024: ${sum} (${((sum/18016674) * 100).toLocaleString("ro-RO", { maximumFractionDigits: 2, minimumFractionDigits: 2 })} %)`);
+	}
+	  )
+	  .catch((error) => console.error(error));
+}
+
 async function load() {
 	await loginDiscord();
 	await google.getkey();
+	// await updateElection();
+	// setInterval( async ()=>{
+	// 	await updateElection();
+	// },10*60*1000)
+	
 }
 load();
+
+
+
+
+
 
 client.on('interactionCreate', interaction => {
 	if (interaction.isButton()) console.log(interaction);
