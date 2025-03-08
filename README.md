@@ -4,8 +4,14 @@
 
 1. Discord Bot Token **[Guide](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot)**
 2. Node.js v16.6.0 or newer
-3. (Optional) YouTube Data API v3 Key (some commands will not work without this)
+3. (Optional) YouTube Data API v3 Key (place in `privatekey.json`)
 4. (Optional) Spotify API Key
+5. (Optional) YouTube User Cookies **[Guide](https://github.com/distubejs/ytdl-core#how-to-get-cookies)** (place in `ytcookie.json`)
+
+> [!IMPORTANT]
+> For music playback both 3 and 5 are required.
+> 
+> 4 is required for Spotify track search
 
 
 
@@ -41,6 +47,7 @@ DATABASE_TYPE=
 ```
 /play https://www.youtube.com/watch?v=fJ9rUzIMcZQ
 /play bohemian rhapsody
+/play song:https://www.youtube.com/playlist?list=PLGBuKfnErZlAkaUUy57-mR97f8SBgMNHh limit:10 (Play the first 10 songs from the playlist)
 ```
 | Method                                 | Link format                                                                                                                                                         |
 |----------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -54,16 +61,21 @@ DATABASE_TYPE=
 | Spotify URI                            | [spotify:track:4PTG3Z6ehGkBFwjybzWkR8](spotify:track:4PTG3Z6ehGkBFwjybzWkR8)                                                                                        |
 
 > [!IMPORTANT]
-> Spotify methods will extract the song metadata (name, artist,...) from the Spotify API and search for the song on YouTube and play the best match. Direct Spotify Playback is not available.
+> Spotify methods will extract the song metadata (name, artist,...) from the Spotify API, search the track on YouTube and play the best match. 
+>
+> Direct Spotify Playback is not available.
 
 * 🎶 Control played music
 ```
 /skip  (Skip to next song in queue)
 /stop  (Stop playing and clear the queue)
+/pause (Pause the current song)
+/resume (Resume the current song)
+/queue (Show the current queue)
 ```
 
 ---
-* 🔎 Find youtube channel subscriber count
+* 🔎 Find YouTube channel subscriber count
 
 ```
 /subs PewDiePie
