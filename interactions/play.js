@@ -2,13 +2,12 @@ const ytdl = require("@distube/ytdl-core");
 const ytpl = require('ytpl');
 const axios = require('axios');
 const queue = new Map();
-const fs = require("fs");
 const {spotifyApi} = require("../utils/spotify");
 
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const { AudioPlayerStatus, createAudioPlayer, createAudioResource, joinVoiceChannel } = require('@discordjs/voice');
 const { MessageEmbed } = require("discord.js");
-const cookies = require("../utils/ytcookie")
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('play')
@@ -16,12 +15,14 @@ module.exports = {
     .addStringOption(option => option.setName("song").setDescription("The name/url of the song/playlist").setRequired(true))
     .addIntegerOption(option => option.setName("limit").setDescription("Playlist number of songs")),
 	async execute(interaction) {
-    let  playlist = null;
+        interaction.deferReply();
+      let  playlist = null;
     let i = 0;
     let limit = interaction.options.getInteger('limit')|| 100;
     const {getkey} = require("../utils/google");
     let g_token = await getkey();
-    await interaction.deferReply();
+    const agent = require("../utils/ytcookie");
+
 
     async function google (title)
     {
@@ -82,12 +83,12 @@ module.exports = {
             connection: connection,
             songs: [],
           };
-          if (connection.state){}
+          if (connection.state){ /* empty */ }
           connection.subscribe(player);
           queue.set(interaction.guild.id, queueContruct);
       
           queueContruct.songs.push(song);
-          player.play(createAudioResource(ytdl(queueContruct.songs[0].url, {filter: 'audioonly',quality: 'lowestaudio',highWaterMark: 1<<25})));
+          player.play(createAudioResource(ytdl(queueContruct.songs[0].url, {quality: 'lowestaudio',highWaterMark: 1<<25, agent })));
         }
         else {
           serverQueue.songs.push(song);
@@ -106,7 +107,7 @@ module.exports = {
       }
 
       player.on(AudioPlayerStatus.Idle, () =>{
-          serverQueue = queue.get(interaction.guild.id);
+          let serverQueue = queue.get(interaction.guild.id);
         if (serverQueue.songs[1])
         {     serverQueue.songs.shift();
               player.play(createAudioResource(ytdl(serverQueue.songs[0].url,{filter: 'audioonly',quality: 'lowestaudio',highWaterMark: 1<<25})));

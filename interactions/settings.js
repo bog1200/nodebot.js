@@ -1,7 +1,7 @@
 const {MessageEmbed, Permissions} = require('discord.js');
 const db = require("../utils/db");
 
-  const { SlashCommandBuilder } = require('@discordjs/builders');
+  const { SlashCommandBuilder } = require('discord.js');
   module.exports = {
     data: new SlashCommandBuilder()
       .setName('settings')
@@ -64,8 +64,9 @@ const db = require("../utils/db");
               break;
             }
           }
-        db.query(sql, function (err, result) {
-            if (err) console.error(err);});
+        await db.query(sql, function (err) {
+          if (err) console.error(err);
+        });
         interaction.editReply({ embeds: [Embed]})
         .catch(error => console.error(error));
     }

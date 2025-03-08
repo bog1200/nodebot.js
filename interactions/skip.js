@@ -1,7 +1,7 @@
 let {queue} = require("./play");
 let {createAudioResource} = require('@discordjs/voice');
 let ytdl=require("@distube/ytdl-core");
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('skip')

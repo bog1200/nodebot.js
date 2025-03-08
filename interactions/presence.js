@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const { MessageEmbed } = require("discord.js");
 module.exports = {
     data: new SlashCommandBuilder()
@@ -10,7 +10,7 @@ module.exports = {
         .addStringOption(option => option.setName("link").setDescription("Twitch live link")),
     async execute(interaction) {
         await interaction.deferReply({ ephemeral: true });
-        if (interaction.user == "239136395665342474") {
+        if (interaction.user === "239136395665342474") {
             const message = interaction.options.getString('message');
             const type = interaction.options.getString('type');
             const status = interaction.options.getString('status');

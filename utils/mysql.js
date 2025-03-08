@@ -20,7 +20,7 @@ function query(query)
 			con.query(query, function (err, result) {
 				con.release();
 				if (err)
-					throw err;
+					reject(err);
 				else
 					resolve(result);
 				})
