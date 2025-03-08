@@ -110,7 +110,7 @@ module.exports = {
           let serverQueue = queue.get(interaction.guild.id);
         if (serverQueue.songs[1])
         {     serverQueue.songs.shift();
-              player.play(createAudioResource(ytdl(serverQueue.songs[0].url,{filter: 'audioonly',quality: 'lowestaudio',highWaterMark: 1<<25})));
+              player.play(createAudioResource(ytdl(serverQueue.songs[0].url,{quality: 'lowestaudio',highWaterMark: 1<<25})));
             
         }
         else 
