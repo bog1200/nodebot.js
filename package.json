@@ -1,6 +1,6 @@
 {
   "name": "romail.app",
-  "version": "2.0.0",
+  "version": "2.0.0-js",
   "main": "index.js",
   "license": "GPL-3.0",
   "scripts": {
@@ -19,7 +19,6 @@
     "@discordjs/opus": "0.10.0",
     "@discordjs/voice": "^0.18.0",
     "@distube/ytdl-core": "^4.16.4",
-    "@types/node": "^22.13.10",
     "axios": "1.8.2",
     "base45": "^3.0.0",
     "cbor": "^10.0.3",

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { MessageEmbed } = require("discord.js");
+const { EmbedBuilder } = require("discord.js");
 let { queue } = require("./play");
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -12,11 +12,11 @@ module.exports = {
 		if (!serverQueue) return interaction.reply("Nothing is playing");
 		if (!serverQueue.repeat) {
 			serverQueue.repeat = true;
-			await interaction.editReply({ embeds: [new MessageEmbed().setColor('#00ff00').setTitle('Repeat').setDescription("Repeat enabled 🔂").setTimestamp()] });
+			await interaction.editReply({ embeds: [new EmbedBuilder().setColor('#00ff00').setTitle('Repeat').setDescription("Repeat enabled 🔂").setTimestamp()] });
 		}
 		else {
 			serverQueue.repeat = false;
-			await interaction.editReply({ embeds: [new MessageEmbed().setColor('#ff0000').setTitle('Repeat').setDescription("Repeat disabled ⏯️").setTimestamp()] });
+			await interaction.editReply({ embeds: [new EmbedBuilder().setColor('#ff0000').setTitle('Repeat').setDescription("Repeat disabled ⏯️").setTimestamp()] });
 		}
 	}
 }

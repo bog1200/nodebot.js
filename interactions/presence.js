@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { MessageEmbed } = require("discord.js");
+const { EmbedBuilder, MessageFlags } = require("discord.js");
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('presence')
@@ -9,7 +9,7 @@ module.exports = {
         .addStringOption(option => option.setName("status").setDescription("Bot status").addChoices({ name: 'Online', value: 'online' }, { name: 'DND', value: 'dnd' }, { name: 'Idle', value: 'idle' }, { name: 'Offline', value: 'offline' }).setRequired(true))
         .addStringOption(option => option.setName("link").setDescription("Twitch live link")),
     async execute(interaction) {
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         if (interaction.user === "239136395665342474") {
             const message = interaction.options.getString('message');
             const type = interaction.options.getString('type');
@@ -17,13 +17,13 @@ module.exports = {
             const link = interaction.options.getString('link');
             if (link) { interaction.client.user.setPresence({ activities: [{ name: message, type: type, url: link, status: status }] }) }
             else { interaction.client.user.setPresence({ activities: [{ name: message, type: type, status: status }] }) }
-            const Embed = new MessageEmbed().setTitle("Bot Presence").setTimestamp()
+            const Embed = new EmbedBuilder().setTitle("Bot Presence").setTimestamp()
                 .addField("Presence", message);
             if (type) Embed.addField("Type", type);
             if (status) Embed.addField("Status", status);
             if (link) Embed.addField("Link", link);
 
-            interaction.editReply({ embeds: [Embed], ephemeral: true })
+            interaction.editReply({ embeds: [Embed], flags: MessageFlags.Ephemeral })
 
         }
     }

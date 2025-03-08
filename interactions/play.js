@@ -4,18 +4,20 @@ const axios = require('axios');
 const queue = new Map();
 const {spotifyApi} = require("../utils/spotify");
 
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionsBitField} = require('discord.js');
 const { AudioPlayerStatus, createAudioPlayer, createAudioResource, joinVoiceChannel } = require('@discordjs/voice');
-const { MessageEmbed } = require("discord.js");
+const { EmbedBuilder, ChannelType } = require("discord.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('play')
 		.setDescription('Play music from YouTube')
-    .addStringOption(option => option.setName("song").setDescription("The name/url of the song/playlist").setRequired(true))
-    .addIntegerOption(option => option.setName("limit").setDescription("Playlist number of songs")),
+        .addStringOption(option => option.setName("song").setDescription("The name/url of the song/playlist").setRequired(true))
+        .addChannelOption(option => option.setName("channel").setDescription("The voice channel to play music").addChannelTypes(ChannelType.GuildVoice))
+        .addIntegerOption(option => option.setName("limit").setDescription("Playlist number of songs")),
 	async execute(interaction) {
-        interaction.deferReply();
+
+        await interaction.deferReply();
       let  playlist = null;
     let i = 0;
     let limit = interaction.options.getInteger('limit')|| 100;
@@ -37,10 +39,11 @@ module.exports = {
       let player;
       if (AudioPlayerStatus.Idle) player = createAudioPlayer();
       const song_input=interaction.options.getString('song');
-      const voiceChannel = interaction.member.voice.channel;
+
+      const voiceChannel =  interaction.options.getChannel('channel') ?  interaction.options.getChannel('channel'): interaction.member.voice.channel;
       if (!voiceChannel) return interaction.editReply("You need to be in a voice channel to play music!");
       const permissions = voiceChannel.permissionsFor(interaction.client.user);
-      if (!permissions.has("CONNECT") || !permissions.has("SPEAK")) return interaction.editReply("I need the permissions to join and speak in your voice channel!");
+      if (!permissions.has(PermissionsBitField.Flags.Connect) || !permissions.has(PermissionsBitField.Flags.Speak)) return interaction.editReply("I need the permissions to join and speak in your voice channel!");
       const connection = joinVoiceChannel({
         channelId: voiceChannel.id,
         guildId: interaction.guild.id,
@@ -95,11 +98,11 @@ module.exports = {
         }
         if (playlist)
         {
-          if (!i) interaction.editReply({embeds: [new MessageEmbed({title: playlist.title ,color: '#00ff00', url: playlist.url, thumbnail: playlist.bestThumbnail ,fields: [
+          if (!i) interaction.editReply({embeds: [new EmbedBuilder({title: playlist.title ,color: 65280 /* #00ff00*/, url: playlist.url, thumbnail: playlist.bestThumbnail ,fields: [
             { name: '\u200b', value: `Added ${limit} songs to queue`,inline: true }],
           timestamp: new Date()})]});
         }
-        else interaction.editReply({embeds: [new MessageEmbed({title: song.title ,color: '#00ff00', url: song.url, thumbnail: song.thumbnail ,fields: [
+        else interaction.editReply({embeds: [new EmbedBuilder({title: song.title ,color: 65280 /* #00ff00*/, url: song.url, thumbnail: song.thumbnail ,fields: [
           { name: '\u200b', value: `Song added to queue`,inline: true }],
         timestamp: new Date()})]});
 

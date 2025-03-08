@@ -1,4 +1,4 @@
-const {MessageEmbed} = require('discord.js');
+const {EmbedBuilder} = require('discord.js');
 const { SlashCommandBuilder } = require('discord.js');
 const axios = require('axios');
 const yt = require('../utils/google');
@@ -12,11 +12,11 @@ module.exports = {
 	async execute(interaction) {	
 
         g_token=await yt.getkey();
-        if(!g_token) interaction.reply({ embeds: [new MessageEmbed().setDescription("Command disabled").setColor("#ff0000")]
+        if(!g_token) interaction.reply({ embeds: [new EmbedBuilder().setDescription("Command disabled").setColor("#ff0000")]
     })
         else {
             const channel=interaction.options.getString('channel');
-            const Embed = new MessageEmbed().setTitle('Youtube Subscriber Count').setTimestamp();
+            const Embed = new EmbedBuilder().setTitle('Youtube Subscriber Count').setTimestamp();
             let ch_id='undefined';
             let ch_name='undefined';
             let subs=-1;

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { MessageEmbed } = require("discord.js");
+const { EmbedBuilder, MessageFlags } = require("discord.js");
 const db = require('../utils/db');
 module.exports = {
     data: new SlashCommandBuilder()
@@ -53,9 +53,9 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         const subcommand = interaction.options.getSubcommand();
-        if (subcommand == 'create') {
+        if (subcommand === 'create') {
             const todo = await db.query(`SELECT * FROM todo WHERE channel_id = ${interaction.channel.id}`);
             if (todo.length > 0) {
                 // Ephemeral reply
@@ -64,19 +64,21 @@ module.exports = {
             else {
                 const title = interaction.options.getString('title');
                 const description = interaction.options.getString('description') || '';
-                const embed = new MessageEmbed().setTitle(title).setDescription(description);
+                const embed = new EmbedBuilder().setTitle(title).setDescription(description);
                 const message = await interaction.channel.send({ embeds: [embed] });
                 // pin the message
                 await message.pin();
-                await interaction.editReply({ content: '✅ ToDo created', ephemeral: true });
+                await interaction.editReply({ content: '✅ ToDo created', flags: MessageFlags.Ephemeral });
                 // insert into db
-                db.query(`INSERT INTO todo (snowflake, channel_id, server_id, title, description) VALUES (${message.id}, ${interaction.channel.id}, ${interaction.guild.id}, "${title}", "${description}")`);
+                await db.query(`INSERT INTO todo (snowflake, channel_id, server_id, title, description)
+                                VALUES (${message.id}, ${interaction.channel.id}, ${interaction.guild.id}, "${title}",
+                                        "${description}")`);
 
             }
         }
-        else if (subcommand == 'clear') {
+        else if (subcommand === 'clear') {
             const todo = await db.query(`SELECT * FROM todo WHERE channel_id = ${interaction.channel.id}`);
-            if (todo.length == 0) {
+            if (todo.length === 0) {
                 // Ephemeral reply
                 await interaction.editReply('⚠️ No ToDo list exists in this channel!');
             }
@@ -84,17 +86,21 @@ module.exports = {
                 // unpin the message
                 await interaction.channel.messages.fetch(`${todo[0].snowflake}`).then(
                     message => { message.unpin(); message.delete(); });
-                await interaction.editReply({ content: '✅ ToDo cleared', ephemeral: true });
-                db.query(`DELETE FROM todo_items WHERE todo_id = ${todo[0].id}`);
+                await interaction.editReply({ content: '✅ ToDo cleared', flags: MessageFlags.Ephemeral });
+                await db.query(`DELETE
+                                FROM todo_items
+                                WHERE todo_id = ${todo[0].id}`);
                 // delete from db
-                db.query(`DELETE FROM todo WHERE channel_id = ${interaction.channel.id}`);
+                await db.query(`DELETE
+                                FROM todo
+                                WHERE channel_id = ${interaction.channel.id}`);
 
             }
 
         }
-        else if (subcommand == 'add') {
+        else if (subcommand === 'add') {
             const todo = await db.query(`SELECT * FROM todo WHERE channel_id = ${interaction.channel.id}`);
-            if (todo.length == 0) {
+            if (todo.length === 0) {
                 // Ephemeral reply
                 await interaction.editReply('⚠️ No ToDo list exists in this channel!');
             }
@@ -116,15 +122,15 @@ module.exports = {
                         index = items.length;
                     }
                     let embedList = [];
-                    embedList.push(new MessageEmbed().setTitle(ToDoTitle).setDescription(ToDoDescription));
+                    embedList.push(new EmbedBuilder().setTitle(ToDoTitle).setDescription(ToDoDescription));
                     for (let i = 0; i < index; i++) {
-                        let embed = new MessageEmbed().setTitle(items[i].title).setDescription(items[i].description);
+                        let embed = new EmbedBuilder().setTitle(items[i].title).setDescription(items[i].description);
                         let embedFields = [];
-                        if (items[i].status == 'done') {
+                        if (items[i].status === 'done') {
                             embed.setColor('GREEN');
                             embedFields.push({ name: 'Status', value: '✅ Done ', inline: true });
                         }
-                        else if (items[i].status == 'inprogress') {
+                        else if (items[i].status === 'inprogress') {
                             embed.setColor('YELLOW');
                             embedFields.push({ name: 'Status', value: '⚠️ In Progress ', inline: true });
                         }
@@ -144,19 +150,19 @@ module.exports = {
                         embedList.push(embed);
                     }
 
-                    let newTask = new MessageEmbed().setTitle(title).setDescription(description).setColor('DARK_RED');
+                    let newTask = new EmbedBuilder().setTitle(title).setDescription(description).setColor('DARK_RED');
                     newTask.addFields({ name: 'Status', value: '❗ Not Started', inline: true }, { name: 'Assigned To', value: 'none', inline: true }, { name: 'Last Update', value: `<t:${Math.floor(new Date().getTime() / 1000)}:R>`, inline: true });
                     newTask.setFooter({ text: `Index: ${index}` });
                     embedList.push(newTask);
 
                     for (let i = index + 1; i <= items.length; i++) {
-                        let embed = new MessageEmbed().setTitle(items[i - 1].title).setDescription(items[i - 1].description);
+                        let embed = new EmbedBuilder().setTitle(items[i - 1].title).setDescription(items[i - 1].description);
                         let embedFields = [];
-                        if (items[i - 1].status == 'done') {
+                        if (items[i - 1].status === 'done') {
                             embed.setColor('GREEN');
                             embedFields.push({ name: 'Status', value: '✅ Done ', inline: true });
                         }
-                        else if (items[i - 1].status == 'inprogress') {
+                        else if (items[i - 1].status === 'inprogress') {
                             embed.setColor('YELLOW');
                             embedFields.push({ name: 'Status', value: '⚠️ In Progress ', inline: true });
                         }
@@ -190,13 +196,13 @@ module.exports = {
                     db.query(`INSERT INTO todo_items (todo_id, title, description, item_number) VALUES (${todo[0].id}, "${title}", "${description}", ${index})`);
 
 
-                    await interaction.editReply({ content: '✅ ToDo item added', ephemeral: true });
+                    await interaction.editReply({ content: '✅ ToDo item added', flags: MessageFlags.Ephemeral });
                 }
             }
         }
-        else if (subcommand == 'remove') {
+        else if (subcommand === 'remove') {
             const todo = await db.query(`SELECT * FROM todo WHERE channel_id = ${interaction.channel.id}`);
-            if (todo.length == 0) {
+            if (todo.length === 0) {
                 // Ephemeral reply
                 await interaction.editReply('⚠️ No ToDo list exists in this channel!');
             }
@@ -210,15 +216,15 @@ module.exports = {
                 const ToDoTitle = todo[0].title;
                 const ToDoDescription = todo[0].description;
                 let embedList = [];
-                embedList.push(new MessageEmbed().setTitle(ToDoTitle).setDescription(ToDoDescription));
+                embedList.push(new EmbedBuilder().setTitle(ToDoTitle).setDescription(ToDoDescription));
                 for (let i = 0; i < items.length; i++) {
-                    let embed = new MessageEmbed().setTitle(items[i].title).setDescription(items[i].description);
+                    let embed = new EmbedBuilder().setTitle(items[i].title).setDescription(items[i].description);
                     let embedFields = [];
-                    if (items[i].status == 'done') {
+                    if (items[i].status === 'done') {
                         embed.setColor('GREEN');
                         embedFields.push({ name: 'Status', value: '✅ Done ', inline: true });
                     }
-                    else if (items[i].status == 'inprogress') {
+                    else if (items[i].status === 'inprogress') {
                         embed.setColor('YELLOW');
                         embedFields.push({ name: 'Status', value: '⚠️ In Progress ', inline: true });
                     }
@@ -254,9 +260,9 @@ module.exports = {
             }
 
 
-        } else if (subcommand == 'mark') {
+        } else if (subcommand === 'mark') {
             const todo = await db.query(`SELECT * FROM todo WHERE channel_id = ${interaction.channel.id}`);
-            if (todo.length == 0) {
+            if (todo.length === 0) {
                 // Ephemeral reply
                 await interaction.editReply('⚠️ No ToDo list exists in this channel!');
             }
@@ -271,15 +277,15 @@ module.exports = {
                 const ToDoTitle = todo[0].title;
                 const ToDoDescription = todo[0].description;
                 let embedList = [];
-                embedList.push(new MessageEmbed().setTitle(ToDoTitle).setDescription(ToDoDescription));
+                embedList.push(new EmbedBuilder().setTitle(ToDoTitle).setDescription(ToDoDescription));
                 for (let i = 0; i < items.length; i++) {
-                    let embed = new MessageEmbed().setTitle(items[i].title).setDescription(items[i].description);
+                    let embed = new EmbedBuilder().setTitle(items[i].title).setDescription(items[i].description);
                     let embedFields = [];
-                    if (items[i].status == 'done') {
+                    if (items[i].status === 'done') {
                         embed.setColor('GREEN');
                         embedFields.push({ name: 'Status', value: '✅ Done ', inline: true });
                     }
-                    else if (items[i].status == 'inprogress') {
+                    else if (items[i].status === 'inprogress') {
                         embed.setColor('YELLOW');
                         embedFields.push({ name: 'Status', value: '⚠️ In Progress ', inline: true });
                     }
@@ -310,9 +316,9 @@ module.exports = {
             }
 
         }
-        else if (subcommand == 'assign') {
+        else if (subcommand === 'assign') {
             const todo = await db.query(`SELECT * FROM todo WHERE channel_id = ${interaction.channel.id}`);
-            if (todo.length == 0) {
+            if (todo.length === 0) {
                 // Ephemeral reply
                 await interaction.editReply('⚠️ No ToDo list exists in this channel!');
             }
@@ -339,15 +345,15 @@ module.exports = {
                     const ToDoTitle = todo[0].title;
                     const ToDoDescription = todo[0].description;
                     let embedList = [];
-                    embedList.push(new MessageEmbed().setTitle(ToDoTitle).setDescription(ToDoDescription));
+                    embedList.push(new EmbedBuilder().setTitle(ToDoTitle).setDescription(ToDoDescription));
                     for (let i = 0; i < items.length; i++) {
-                        let embed = new MessageEmbed().setTitle(items[i].title).setDescription(items[i].description);
+                        let embed = new EmbedBuilder().setTitle(items[i].title).setDescription(items[i].description);
                         let embedFields = [];
-                        if (items[i].status == 'done') {
+                        if (items[i].status === 'done') {
                             embed.setColor('GREEN');
                             embedFields.push({ name: 'Status', value: '✅ Done ', inline: true });
                         }
-                        else if (items[i].status == 'inprogress') {
+                        else if (items[i].status === 'inprogress') {
                             embed.setColor('YELLOW');
                             embedFields.push({ name: 'Status', value: '⚠️ In Progress ', inline: true });
                         }
@@ -379,9 +385,9 @@ module.exports = {
             }
 
         }
-        else if (subcommand == 'unassign') {
+        else if (subcommand === 'unassign') {
             const todo = await db.query(`SELECT * FROM todo WHERE channel_id = ${interaction.channel.id}`);
-            if (todo.length == 0) {
+            if (todo.length === 0) {
                 // Ephemeral reply
                 await interaction.editReply('⚠️ No ToDo list exists in this channel!');
             }
@@ -395,15 +401,15 @@ module.exports = {
                 const ToDoTitle = todo[0].title;
                 const ToDoDescription = todo[0].description;
                 let embedList = [];
-                embedList.push(new MessageEmbed().setTitle(ToDoTitle).setDescription(ToDoDescription));
+                embedList.push(new EmbedBuilder().setTitle(ToDoTitle).setDescription(ToDoDescription));
                 for (let i = 0; i < items.length; i++) {
-                    let embed = new MessageEmbed().setTitle(items[i].title).setDescription(items[i].description);
+                    let embed = new EmbedBuilder().setTitle(items[i].title).setDescription(items[i].description);
                     let embedFields = [];
-                    if (items[i].status == 'done') {
+                    if (items[i].status === 'done') {
                         embed.setColor('GREEN');
                         embedFields.push({ name: 'Status', value: '✅ Done ', inline: true });
                     }
-                    else if (items[i].status == 'inprogress') {
+                    else if (items[i].status === 'inprogress') {
                         embed.setColor('YELLOW');
                         embedFields.push({ name: 'Status', value: '⚠️ In Progress ', inline: true });
                     }

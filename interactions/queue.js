@@ -1,6 +1,6 @@
 let {queue} = require("./play");
 const { SlashCommandBuilder } = require('discord.js');
-const {MessageEmbed} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('queue')
@@ -9,17 +9,20 @@ module.exports = {
         await interaction.deferReply();
 		if (!queue) return interaction.reply("Nothing is playing");
 		const serverQueue = queue.get(interaction.guild.id);
-        
-        const Embed = new MessageEmbed().setColor('#ff00ff').setTitle(`Queue`).addField(`**Now playing:**`,`[${serverQueue.songs[0].title}](${serverQueue.songs[0].url})`);
-        if (serverQueue.songs[1]) {
-            Embed.addField('Next:','\u200B');
+        let EmbedFields = [];
+        EmbedFields.push({name: 'Now Playing', value: `**${serverQueue.songs[0].title}** (${serverQueue.songs[0].url})`});
+        if(serverQueue.songs[1]) {
+            EmbedFields.push({name: 'Next', value: '\u200B'});
             for (let i=1;i<=5;i++) {
-                if (serverQueue.songs[i]) Embed.addField(`**${i})** ${serverQueue.songs[i].title}`,`(${serverQueue.songs[i].url})`);
+                if (serverQueue.songs[i]) EmbedFields.push({name: `**${i})** ${serverQueue.songs[i].title}`, value: `(${serverQueue.songs[i].url})`});
                 else break;
             }
-            if (serverQueue.songs.length>6) 
-                Embed.addField(`....`,`And ${serverQueue.songs.length-6} more...`);
+            if (serverQueue.songs.length>6)
+                EmbedFields.push({name: '....', value: `And ${serverQueue.songs.length-6} more...`});
         }
+
+        
+        const Embed = new EmbedBuilder().setColor('#ff00ff').setTitle(`Queue`).setTimestamp().addFields(EmbedFields);
         interaction.editReply({ embeds: [Embed]});
 	},
 };
