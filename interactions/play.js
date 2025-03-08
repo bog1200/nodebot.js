@@ -50,9 +50,11 @@ module.exports = {
         adapterCreator: interaction.guild.voiceAdapterCreator,
       });
   
-      if (song_input.match(/[\bhttps://open.\b]*spotify[\b.com\b]*[/:]*track[/:]*[A-Za-z0-9?=]+/))
+      if (song_input.match(/(?:https:\/\/open\.spotify\.com\/track\/|spotify:track:)[A-Za-z0-9]+/))
       {
-        const {body} = await spotifyApi.getTrack(song_input.slice(31,53));
+          const trackMatch = song_input.match(/(?:track\/|spotify:track:)([A-Za-z0-9]+)/);
+          const track = trackMatch ? trackMatch[1] : null;
+        const {body} = await spotifyApi.getTrack(track);
         const sp_nam= await google(encodeURI(`${body.name} ${body.artists[0].name}`));
         play(await ytdl.getInfo(sp_nam)); 
       }   

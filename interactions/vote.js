@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const {MessageActionRow, MessageButton, EmbedBuilder} = require("discord.js");
+const {EmbedBuilder} = require("discord.js");
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('vote')
@@ -73,7 +73,7 @@ module.exports = {
             {
               if (countdown<=5) clearInterval(timer);
               countdown=countdown-1;
-                    if ((countdown%5===0 && countdown<=60) || (countdown%60===0 && countdown>60 && countdown<=300)|| (countdown%300===0 && countdown>300 && countdown<=3600) ||(countdown%1800==0 && countdown > 3600))
+                    if ((countdown%5===0 && countdown<=60) || (countdown%60===0 && countdown>60 && countdown<=300)|| (countdown%300===0 && countdown>300 && countdown<=3600) ||(countdown%1800===0 && countdown > 3600))
                {
                  if (countdown<60 && init_countdown<1) countdown_format=`${countdown}s`
                  else if (countdown<3600) countdown_format=`${Math.floor(countdown/60)}m`
@@ -90,8 +90,7 @@ module.exports = {
         let votes = Array.from(collected.entries());
         yes=votes[0][1]['count']-1;
         no=votes[1][1]['count']-1;
-        let result="Draw";
-        let color;
+        let result, color;
         if (yes>no) {result = "✅"; color=`#00FF00`}
         else if (yes===no) {result = "Draw"; color=`#FFF000`}
         else {result="❌"; color=`#FF0000`}

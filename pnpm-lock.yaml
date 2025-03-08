@@ -17,9 +17,6 @@ importers:
       '@distube/ytdl-core':
         specifier: ^4.16.4
         version: 4.16.4
-      '@types/node':
-        specifier: ^22.13.10
-        version: 22.13.10
       axios:
         specifier: 1.8.2
         version: 1.8.2

@@ -42,6 +42,20 @@ DATABASE_TYPE=
 /play https://www.youtube.com/watch?v=fJ9rUzIMcZQ
 /play bohemian rhapsody
 ```
+| Method                                 | Link format                                                                                                                                                         |
+|----------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Search                                 | Song title (plays first result from YT)                                                                                                                             |
+| Youtube URL (Full)                     | https://www.youtube.com/watch?v=dQw4w9WgXcQ                                                                                                                         |
+| Youtube URL (Short)                    | https://youtu.be/dQw4w9WgXcQ                                                                                                                                        |
+| Youtube Music URL                      | https://music.youtube.com/watch?v=dQw4w9WgXcQ                                                                                                                       |
+| Youtube Playlist                       | https://www.youtube.com/playlist?list=PLGBuKfnErZlAkaUUy57-mR97f8SBgMNHh |
+| Youtube Playlist (Track from playlist) | https://www.youtube.com/watch?v=xFrGuyw1V8s&list=PLGBuKfnErZlAkaUUy57-mR97f8SBgMNHh&index=1 |
+| Spotify Web URL                        | https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8                                                                                                               |
+| Spotify URI                            | [spotify:track:4PTG3Z6ehGkBFwjybzWkR8](spotify:track:4PTG3Z6ehGkBFwjybzWkR8)                                                                                        |
+
+> [!IMPORTANT]
+> Spotify methods will extract the song metadata (name, artist,...) from the Spotify API and search for the song on YouTube and play the best match. Direct Spotify Playback is not available.
+
 * 🎶 Control played music
 ```
 /skip  (Skip to next song in queue)
@@ -58,11 +72,13 @@ DATABASE_TYPE=
 
 > The credentials file MUST be saved as privatekey.json
 ---
-* 😷 Find data about COVID-19 cases around the world
+* ~~😷 Find data about COVID-19 cases around the world~~ 
 ```
 /covid RO
 /incidence IF (Only available for Romania counties)
 ```
+> [!NOTE]
+> No longer available
 
 ---
 *  💬 Delete messages in bulk
@@ -71,12 +87,12 @@ DATABASE_TYPE=
 ```
 
 ---
-* 📊 Create a poll
+* 📊 Create a vote
 ```
-/poll 1h Question?
+/vote 1h Question?
 ```
 <details>
-<summary>Poll</summary>
+<summary>Vote</summary>
 <img src=https://i.imgur.com/Mlyao2p.png>
 </details>
 
